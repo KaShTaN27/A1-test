@@ -22,7 +22,7 @@ public class CSVParser implements Parser {
 
     @Override
     public <T> List<T> parse(File file) {
-        char separator = determineSeparator(file);
+        var separator = determineSeparator(file);
         var ruleName = file.getName().split("\\.")[0];
         try (var reader = configureReader(file, separator)) {
             return parseRecords(reader, ruleName);
@@ -32,8 +32,8 @@ public class CSVParser implements Parser {
     }
 
     private char determineSeparator(File file) {
-        try (CSVReader reader = new CSVReader(new FileReader(file))) {
-            String[] header = reader.readNext();
+        try (var reader = new CSVReader(new FileReader(file))) {
+            var header = reader.readNext();
             if (header.length > 1)
                 return ',';
             if (header[0].split(";").length > 1)
@@ -46,7 +46,7 @@ public class CSVParser implements Parser {
     }
 
     private CSVReader configureReader(File file, char separator) throws FileNotFoundException {
-        com.opencsv.CSVParser parser = new CSVParserBuilder()
+        var parser = new CSVParserBuilder()
                 .withSeparator(separator)
                 .build();
         return new CSVReaderBuilder(new FileReader(file))
@@ -56,7 +56,7 @@ public class CSVParser implements Parser {
     }
 
     private <T> List<T> parseRecords(CSVReader reader, String parsingRuleName) throws IOException, CsvException {
-        List<String[]> records = reader.readAll();
+        var records = reader.readAll();
         ParsingRule<T> rule = rulesFactory.getRule(parsingRuleName);
         return records.stream()
                 .filter(r -> r.length > 1)
