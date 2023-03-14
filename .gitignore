@@ -1,8 +1,4 @@
-Supplies/.idea
-Supplies/target
+**/.idea
+**/target
 
-ipConverter/.idea
-ipConverter/target
-
-FunctionLimit/.idea
-FunctionLimit/target
+*.iml
