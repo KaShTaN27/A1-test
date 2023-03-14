@@ -14,6 +14,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     public List<User> saveAll(List<User> users) {
-        return userRepository.saveAll(users);
+        return userRepository.saveAll(users.stream()
+                .filter(u -> !userRepository.existsByAccountName(u.getAccountName()))
+                .toList());
     }
 }

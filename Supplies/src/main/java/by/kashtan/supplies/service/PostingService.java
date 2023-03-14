@@ -18,8 +18,9 @@ public class PostingService {
     private final PostingRepository postingRepository;
 
     public List<Posting> saveAll(List<Posting> postings) {
-        postings = getNotSavedPostings(postings);
-        var saved = postingRepository.saveAll(postings);
+        var saved = postingRepository.saveAll(postings.stream()
+                .filter(p -> !postingRepository.existsByPostingNumber(p.getPostingNumber()))
+                .toList());
         saved.forEach(p -> {
             p.getProducts().forEach(pr -> pr.setPosting(p));
             p.setProducts(productService.saveAll(p.getProducts()));
@@ -30,17 +31,5 @@ public class PostingService {
     public List<Posting> getAll(Date from, Date to, Boolean isAuth) {
         var filterByDateRangeAndAuth = postingSpecifications.filterByDateRangeAndAuth(from, to, isAuth);
         return postingRepository.findAll(filterByDateRangeAndAuth);
-    }
-
-    private List<Posting> getNotSavedPostings(List<Posting> postings) {
-        var numbers = postings.stream()
-                .map(Posting::getPostingNumber)
-                .toList();
-        var savedNumbers = postingRepository.findAllByPostingNumberIn(numbers).stream()
-                .map(Posting::getPostingNumber)
-                .toList();
-        return postings.stream()
-                .filter(p -> !savedNumbers.contains(p.getPostingNumber()))
-                .toList();
     }
 }
